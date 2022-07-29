@@ -1,0 +1,100 @@
+---
+title: "Untitled"
+output: html_document
+date: '2022-07-27'
+---
+
+```{r setup, include=FALSE}
+
+source("01-setup.R")
+source("02-describe.R")
+
+library(kableExtra)
+
+```
+
+## Overview
+
+This data is from 2017 for the Deferred Action for Childhood Arrivals (DACA), which was under a 6-month phase-out at the time.   This data gives the number of applications, number of accepted applications, number of approved applications and some additional related statistics on a by state basis (including the District of Columbia) in the United States.
+
+### Metric Multidimensional Scaling
+**Definition:** Metric multidimensional scaling (MDS) refers to a family of statistical methods that focus on creating visual mappings of items based on distance.  It gives a way to provide a low-dimensional (usually two-dimensional) view of a high-dimensional data set.  
+
+MDS can be a helpful way to uncover patterns within the data and is able to handle both metric and non-metric data.
+
+* Metric multidimensional scaling: works with numerical distances where there is one distance for each pair of records (i.e., no measurement error).  This approach is similar to a principal component analysis (PCA) in approach, but a PCA works with original data rather than a distance matrix.
+* Non-metric multidimensional scaling: works with non-numerical distances between items where there is one distance for each pair of records (i.e, no measurement error).  This method works with a dissimilarity matrix rather than a distance matrix to be applied to non-numerical data (e.g., ordinal data).
+  + This method works to minimize "stress."  Stress can be thought of as the difference between the data points' original dissimilarities and their dissimilarities in the map.  Typically, anything near zero has a good fit, while anything over 0.2 can be considered a poor fit, although it should always be examined within the context of the matrix.
+* Individual differences scaling: is used when you have multiple estimates of distances between records.
+* Multidimensional analysis of preference: is also used when you have multiple estimates of the distance between records; however this method uses ranking data rather than distance matrices.
+
+
+
+## Data Overview
+The DACA dataset has the following features available by default:
+
+* State – name of state
+*	Lawsuit – whether the state had a lawsuit regarding DACA at the time?  
+  + T = against Trump action, O = against Obama’s executive order establishing DACA, N = none
+*	AcceptInit – number of accepted initial new applications.  This only deals with accepting their application for review, NOT final approval of their application.
+*	AcceptRenew – number of accepted renewal applications.  Again this only deals with accepting their renewal for review, NOT final approval of their renewal.
+*	AcceptTotal – number of applications accepted for review (AcceptInit + AcceptRenew)
+*	ApprovedInit – number of initial application ultimately approved.
+*	ApprovedRenew – number of renewal applications ultimately approved.
+*	ApproveTotal – number of applications of either type ultimately approved (ApprovedInit + ApprovedRenew)
+*	Pop16 – population in state/district in 2016.
+*	AcceptPerPop – proportion of state population that filed for DACA status.  (AcceptTotal/Pop16)
+*	ApprovedPerPop – proportion of state population that received DACA approval.  (ApproveTotal/Pop16)
+*	MinPer14 – percent of population in the state/district that is considered minority status.
+*	PerWhite – proportion of population that is classified as white/Caucasian.
+*	PerHisp – proportion of population that is classified as Hispanic.
+*	PerBlack – proportion of population that is Black.
+*	PerAsian – proportion of population that is Asian.
+
+Additional variables were added for review:
+
+* perc_approve_init - the percentage of applications approved that were initial applications 
+* perc_approve_renew - the percentage of applications approved that were renewal applications 
+* perc_approved - the total number of applications accepted that were ultimately approved
+* renew_over_init - among approved applications, the ratio of initial applications to approved applications
+* approve_per_min - the proportion of the state minority population that recieved DACA approval
+
+
+```{r, echo=FALSE, warning=FALSE}
+
+kable(head(df_daca)) %>%
+  kable_styling(full_width = T)
+
+```
+
+## Metric Dimensional Scaling Results
+
+Variables were considered for metric dimensional scaling with the following results:
+
+*Approval per population:* This variable is well represented in two-dimensional space, with a stress metric of `r stress_approved_per_pop`. No difference exists across lawsuit status, but there is not a difference based on lawsuit status.
+
+```{r, echo=FALSE, message=FALSE, out.width = '75%', warning=FALSE}
+
+p_approval_by_lawsuit
+
+```
+
+
+*Percent Approved:* This variable is well represented in two-dimensional space, with a stress metric of `r stress_perc_approved`. No difference exists across lawsuit status.
+
+```{r, echo=FALSE, message=FALSE, out.width = '75%', warning=FALSE}
+
+p_perc_approved_by_lawsuit
+
+```
+
+
+
+
+*Percent Approved by Minority Population:* This variable is well represented in two-dimensional space, with a stress metric of `r stress_approve_per_min`. This suggests there may be some difference based on lawsuit status, but it is relatively weak.
+
+```{r, echo=FALSE, message=FALSE, out.width = '75%', warning=FALSE}
+
+p_min_approved_by_lawsuit
+
+```
