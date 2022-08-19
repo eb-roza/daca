@@ -1,0 +1,136 @@
+---
+title: "Untitled"
+output: html_document
+date: '2022-07-27'
+---
+
+```{r setup, include=FALSE}
+
+source("01-setup.R")
+source("02-describe.R")
+
+library(kableExtra)
+
+```
+
+## Overview
+
+This data is from 2017 for the Deferred Action for Childhood Arrivals (DACA), which was under a 6-month phase-out at the time.   This data gives the number of applications, number of accepted applications, number of approved applications and some additional related statistics on a by state basis (including the District of Columbia) in the United States.
+
+### Metric Multidimensional Scaling
+**Definition:** Metric multidimensional scaling (MDS) refers to a family of statistical methods that focus on creating visual mappings of items based on distance.  It gives a way to provide a low-dimensional (usually two-dimensional) view of a high-dimensional data set.  
+
+MDS can be a helpful way to uncover patterns within the data and is able to handle both metric and non-metric data.
+
+* **Metric multidimensional scaling:** works with numerical distances where there is one distance for each pair of records (i.e., no measurement error).  This approach is similar to a principal component analysis (PCA) in approach, but a PCA works with original data rather than a distance matrix.
+* **Non-metric multidimensional scaling:** works with non-numerical distances between items where there is one distance for each pair of records (i.e, no measurement error).  This method works with a dissimilarity matrix rather than a distance matrix to be applied to non-numerical data (e.g., ordinal data).
+  + This method works to minimize "stress."  Stress can be thought of as the difference between the data points' original dissimilarities and their dissimilarities in the map.  Typically, anything near zero has a good fit, while anything over 0.2 can be considered a poor fit, although it should always be examined within the context of the matrix.
+* **Individual differences scaling:** is used when you have multiple estimates of distances between records.
+* **Multidimensional analysis of preference:** is also used when you have multiple estimates of the distance between records; however this method uses ranking data rather than distance matrices.
+
+
+
+## Data Overview
+The DACA dataset has the following features available by default:
+
+* State – name of state
+*	Lawsuit – whether the state had a lawsuit regarding DACA at the time?  
+  + T = against Trump action, O = against Obama’s executive order establishing DACA, N = none
+*	AcceptInit – number of accepted initial new applications.  This only deals with accepting their application for review, NOT final approval of their application.
+*	AcceptRenew – number of accepted renewal applications.  Again this only deals with accepting their renewal for review, NOT final approval of their renewal.
+*	AcceptTotal – number of applications accepted for review (AcceptInit + AcceptRenew)
+*	ApprovedInit – number of initial application ultimately approved.
+*	ApprovedRenew – number of renewal applications ultimately approved.
+*	ApproveTotal – number of applications of either type ultimately approved (ApprovedInit + ApprovedRenew)
+*	Pop16 – population in state/district in 2016.
+*	AcceptPerPop – proportion of state population that filed for DACA status.  (AcceptTotal/Pop16)
+*	ApprovedPerPop – proportion of state population that received DACA approval.  (ApproveTotal/Pop16)
+*	MinPer14 – percent of population in the state/district that is considered minority status.
+*	PerWhite – proportion of population that is classified as white/Caucasian.
+*	PerHisp – proportion of population that is classified as Hispanic.
+*	PerBlack – proportion of population that is Black.
+*	PerAsian – proportion of population that is Asian.
+
+Additional variables were added for review:
+
+* PercApproveInit - percentage of total approved applications that are initial applications.
+* PercApproveRenew - percentage of total approved applications that are renewal applications.
+* PercApproved - percentage of accepted applications that are approved.
+* ApprovePer Min - proportion of approved applications as a percentage of minority population.
+
+
+```{r}
+
+head(df_daca) %>%
+  kable() %>%
+  kable_styling()
+
+```
+
+## Conducting MDS
+
+One measurement of multidimensional scaling is "stress."   Stress provides a representation of a residual sum of squares and represents and overall measure of fit. As a general rule of thumb: stress < 0.05 provides an excellent representation in reduced dimensions,  stress < 0.1 is great, < 0.2 is acceptable, and stress < 0.3 provides a poor representation; more simply high stress is bad, low stress is good.  
+
+When selecting the number of dimensions to use in MDS, keep in mind that generally, the stress will decrease with any increase in dimensions.  A trade-off will always be made between number of dimensions and level of stress.
+
+For this data, we will evaluate the variables based on lawsuit status.
+
+### Two Dimensions
+
+**Percent Approved: **Reducing the data in two dimensions using overall percent approved, we can see graphically there is a grouping of the data according to lawsuit status (though there is still some overlap), suggesting this is a good representation of the differences in the original data.  Further confirming this, the stress for this reduction is `r stress_perc_approved2`, far below our guidelines of 0.05.
+
+```{r, echo=FALSE, fig.align='center', out.width='90%'}
+
+plot(mds_perc_approved2$points, type="n")
+
+text(mds_perc_approved2$points, 
+     as.character(cln_daca$state),col=as.numeric(as.factor(cln_daca$lawsuit))+2)
+
+
+```
+
+
+**Percent Approved per Minority: **Reducing the data in two dimensions using overall percent approved based on the minority population, we can see graphically there is a grouping of the data according to lawsuit status (though there is still some overlap), suggesting this is a good representation of the differences in the original data.  Further confirming this, the stress for this reduction is `r stress_perc_approved2`, far below our guidelines of 0.05.
+
+This view in particular highlights the outlying states of California and Texas.
+
+```{r, echo=FALSE, fig.align='center', out.width='90%'}
+
+plot(mds_approv_per_min$points, type="n")
+
+text(mds_approv_per_min$points, 
+     as.character(cln_daca$state),col=as.numeric(as.factor(cln_daca$lawsuit))+2)
+
+
+```
+
+**Percent Minority Population: **Reducing the data in two dimensions using minority population, we can see graphically, there is a grouping of the data according to lawsuit status (though there is still some overlap), suggesting this is a good representation of the differences in the original data.  Further confirming this, the stress for this reduction is `r stress_perc_approved2`, far below our guidelines of 0.05.  
+
+This view in particular highlights the outlying state of Alaska.
+
+```{r, echo=FALSE, fig.align='center', out.width='90%'}
+
+plot(mds_minority$points, type="n")
+
+text(mds_minority$points, 
+     as.character(cln_daca$state),col=as.numeric(as.factor(cln_daca$lawsuit))+2)
+
+
+```
+
+
+
+
+### Three Dimensions
+
+**Percent Approved: **Adding an additional dimension yields only a slight improvement in stress (`r stress_perc_approved3` when k = 3 and `rstress_perc_approved2` when k = 2).  Visually, we can see the distance relationships remain relatively steady.
+
+```{r, echo=FALSE, fig.align='center', out.width='90%'}
+
+plot(mds_perc_approved3$points, type="n")
+
+text(mds_perc_approved3$points, 
+     as.character(cln_daca$state),col=as.numeric(as.factor(cln_daca$lawsuit))+2)
+
+
+```
