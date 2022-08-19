@@ -22,6 +22,7 @@ This data is from 2017 for the Deferred Action for Childhood Arrivals (DACA), wh
 
 MDS can be a helpful way to uncover patterns within the data and is able to handle both metric and non-metric data.
 
+
 * **Metric multidimensional scaling:** works with numerical distances where there is one distance for each pair of records (i.e., no measurement error).  This approach is similar to a principal component analysis (PCA) in approach, but a PCA works with original data rather than a distance matrix.
 * **Non-metric multidimensional scaling:** works with non-numerical distances between items where there is one distance for each pair of records (i.e, no measurement error).  This method works with a dissimilarity matrix rather than a distance matrix to be applied to non-numerical data (e.g., ordinal data).
   + This method works to minimize "stress."  Stress can be thought of as the difference between the data points' original dissimilarities and their dissimilarities in the map.  Typically, anything near zero has a good fit, while anything over 0.2 can be considered a poor fit, although it should always be examined within the context of the matrix.
@@ -86,8 +87,8 @@ plot(mds_perc_approved2$points, type="n")
 text(mds_perc_approved2$points, 
      as.character(cln_daca$state),col=as.numeric(as.factor(cln_daca$lawsuit))+2)
 
-
 ```
+
 
 
 **Percent Approved per Minority: **Reducing the data in two dimensions using overall percent approved based on the minority population, we can see graphically there is a grouping of the data according to lawsuit status (though there is still some overlap), suggesting this is a good representation of the differences in the original data.  Further confirming this, the stress for this reduction is `r stress_perc_approved2`, far below our guidelines of 0.05.
@@ -120,10 +121,9 @@ text(mds_minority$points,
 
 
 
-
 ### Three Dimensions
 
-**Percent Approved: **Adding an additional dimension yields only a slight improvement in stress (`r stress_perc_approved3` when k = 3 and `rstress_perc_approved2` when k = 2).  Visually, we can see the distance relationships remain relatively steady.
+**Percent Approved: **In this case, adding an additional dimension does not improve the stress, with both stress levels being approximately equal. (`r stress_perc_approved3` when k = 3 and `r stress_perc_approved2` when k = 2).  Visually, we can see the distance relationships remain relatively steady, suggesting there is no notable gain from the additional dimension.
 
 ```{r, echo=FALSE, fig.align='center', out.width='90%'}
 
@@ -134,3 +134,4 @@ text(mds_perc_approved3$points,
 
 
 ```
+

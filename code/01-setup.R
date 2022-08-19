@@ -39,4 +39,6 @@ cln_daca <- df_daca %>%
   mutate(perc_approve_init = approved_init/approve_total,
          perc_approve_renew = approved_renew/approve_total,
          perc_approved = approve_total/accept_total,
-         approv_per_min = approve_total*min_per14) 
+         approv_per_min = approve_total*min_per14, 
+         renew_over_init = approved_init/approved_renew,
+         approv_per_min = approve_total/min_per14) 

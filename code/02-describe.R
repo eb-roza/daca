@@ -62,5 +62,3 @@ plot(mds$points, type="n")
 text(mds$points, as.character(cln_daca$state),col=as.numeric(as.factor(cln_daca$lawsuit))+2)
 
 
-
-
